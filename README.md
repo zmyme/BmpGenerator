@@ -4,7 +4,7 @@
 
 ## 1. What's this and what can it do?##
 
-This is an tiny C++ library which can be used to draw something on a bmp picture. It can be used in algorithm visualization and maybe computer vision (this may cause sometime but i will try my best to make it ^_^).
+This is an tiny C++ library which can be used to draw something on a bmp picture. It can be used in algorithm visualization and maybe computer vision (this may cost sometime but i will try my best to make it ^_^).
 
 ##2. How to install it?##
 
@@ -51,7 +51,7 @@ Currently I only provided a few function for you to use. here they are:
     int bar(INT_32 x1,INT_32 y1,INT_32 x2,INT_32 y2,Palette color);//draw a bar.
     int circle(INT_32 x,INT_32 y,INT_32 r,Palette color);// draw a circle.
 
-As for the detail document, please return somedays later and i will wirite a full document.
+As to the detail document, please return somedays later and i will wirite a full document.
 
 ##4. Somethings else##
 
