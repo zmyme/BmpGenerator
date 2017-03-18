@@ -5,7 +5,7 @@
 #include <fstream>
 #include <cstring>
 
-#include <cstdlib>
+// #include <cstdlib>
 
 #pragma pack(2)
 
@@ -13,7 +13,28 @@ typedef short INT_16;
 typedef int INT_32;
 typedef unsigned char INT_8;
 
-using namespace std;
+// using namespace std;
+
+
+
+class Point
+{
+public:
+	int x;
+	int y;
+
+	Point(int a,int b)
+	{
+		x=a;
+		y=b;
+	}
+
+	Point(void)
+	{
+		x=0;
+		y=0;
+	}
+};
 
 class Palette
 {
@@ -37,8 +58,8 @@ public:
 		Red   =r;
     }
     static INT_32 GetColor(INT_8 b,INT_8 g,INT_8 r);
-    static Palette GetPalette(INT_32 color);
-    static Palette GetPalette(INT_8 b,INT_8 g,INT_8 r);
+    // static Palette GetPalette(INT_32 color);
+    // static Palette GetPalette(INT_8 b,INT_8 g,INT_8 r);
     INT_32 TellColor(void);
 
     //below is data.
@@ -109,6 +130,7 @@ public:
 	//Load and write.
 	int load(const char *path);
     int write(const char *path);
+    int resize(int NewWidth,int NewHeight);
 
 	//basic draw function.
     int SetSize(INT_32 width, INT_32 height);
@@ -126,6 +148,14 @@ public:
     int bar(INT_32 x1,INT_32 y1,INT_32 x2,INT_32 y2,Palette color);
     int circle(INT_32 x,INT_32 y,INT_32 r,Palette color);
 private:
+	int PixelOnPointer(INT_32 x,INT_32 y,Palette color,Palette* pointer,int MatWidth,int MatHeight)
+	{
+		if(x>=0&&y>=0&&x<MatWidth&&y<MatHeight)
+	    {
+	        *(pointer+y*MatWidth+x)=color;
+	    }
+	    return 0;
+	}
 	inline void InitFileHeader(void)
 	{
 		file.bfType      =0x4d42;
@@ -159,5 +189,13 @@ int AntiColor(Bmp *source,Bmp *dest);
 Palette AverageColor(Bmp *source,int x,int y,int pixel);
 int Blurry(Bmp *source,Bmp *dest,int pixel);
 int Mosaic(Bmp *source,Bmp *dest,int pixel);
+int AdjustLight(Bmp *source,Bmp *dest,float light);
+int ImageFusion(Bmp *pic1,float weight1,Bmp *pic2,float weight2,Bmp *dest);
+float GetPixelPercentAround(Bmp *pic,int x,int y,int pixel,Palette color);
+int EliminateNoiseInBinaryPic(Bmp *source,Bmp *dest,int pixel,float noise);
+
+
+
+// int Blurry2(Bmp *source,Bmp *dest,int pixel);
 
 #endif

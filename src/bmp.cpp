@@ -1,3 +1,4 @@
+#include <vector>
 #include "bmp.h"
 
 inline INT_32 Palette::GetColor(INT_8 b,INT_8 g,INT_8 r)
@@ -9,16 +10,16 @@ inline INT_32 Palette::GetColor(INT_8 b,INT_8 g,INT_8 r)
     return temp;
 }
 
-inline Palette Palette::GetPalette(INT_32 color)
-{
-    Palette temp(color);
-    return temp;
-}
-inline Palette Palette::GetPalette(INT_8 b,INT_8 g,INT_8 r)
-{
-    Palette temp(b,g,r);
-    return temp;
-}
+// inline Palette Palette::GetPalette(INT_32 color)
+// {
+//     Palette temp(color);
+//     return temp;
+// }
+// inline Palette Palette::GetPalette(INT_8 b,INT_8 g,INT_8 r)
+// {
+//     Palette temp(b,g,r);
+//     return temp;
+// }
 
 int Bmp::SetSize(INT_32 width, INT_32 height)
 {
@@ -44,11 +45,11 @@ int Bmp::load(const char *path)
     {
         return -1;
     }
-    fstream pic;
-    pic.open(path,ios::binary|ios::in);
+    std::fstream pic;
+    pic.open(path,std::ios::binary|std::ios::in);
     if(pic.is_open()==0)
     {
-        cout<<"Open file "<<path<<" failed"<<endl;
+        std::cout<<"Open file "<<path<<" failed"<< std::endl;
         return -1;
     }
     pic.read((char *) &file,sizeof(BmpFileHeader));
@@ -67,11 +68,11 @@ int Bmp::load(const char *path)
 
 int Bmp::write(const char *path)
 {
-    fstream temp;
-    temp.open(path,ios::binary|ios::out|ios::trunc);
+    std::fstream temp;
+    temp.open(path,std::ios::binary|std::ios::out|std::ios::trunc);
     if(temp.is_open()==0)
     {
-        cout<<"Open File "<<path<<" failed!"<<endl;
+        std::cout<<"Open File "<<path<<" failed!"<< std::endl;
         return -1;
     }
     temp.write((char *) &file,sizeof(BmpFileHeader));
@@ -192,155 +193,27 @@ int Bmp::circle(INT_32 x,INT_32 y,INT_32 r,Palette color)
     return 0;
 }
 
-
-int RGB2Grey(Bmp *source, Bmp *dest)
+int Bmp::resize(int NewWidth,int NewHeight)
 {
-    for(int i=0;i<source->width();i++)
+    int OldWidth=width();
+    int OldHeight=height();
+
+    Palette *newdata = NULL;
+    newdata = new Palette[NewWidth*NewHeight];
+
+    for(int i=0;i<NewWidth;i++)
     {
-        for(int j=0;j<source->height();j++)
+        for(int j=0;j<NewHeight;j++)
         {
-            Palette temp=source->getpixel(i,j);
-            int average=(temp.Blue+temp.Red+temp.Green)/3;
-            dest->pixel(i,j,Palette(average,average,average));
+            PixelOnPointer(i,j,getpixel((i*OldWidth)/NewWidth,(j*OldHeight)/NewHeight),newdata,NewWidth,NewHeight);
         }
     }
+
+    delete[] data;
+    data = newdata;
+    info.biWidth = NewWidth;
+    info.biHeight = NewHeight;
     return 0;
 }
 
-int Grey2Binary(Bmp *source,Bmp *dest,float light)
-{
-    int average=0;
 
-    for(int i=0;i<source->width();i++)
-    {
-        for(int j=0;j<source->height();j++)
-        {
-            average+=source->getpixel(i,j).Blue;
-        }
-    }
-
-    average=average/(source->width()*source->height());
-
-    for(int i=0;i<source->width();i++)
-    {
-        for(int j=0;j<source->height();j++)
-        {
-            Palette temp=source->getpixel(i,j);
-            if(temp.Blue>average/light)
-            {
-                dest->pixel(i,j,Palette(255,255,255));
-            }
-            else
-            {
-                dest->pixel(i,j,Palette(0,0,0));
-            }
-            
-        }
-    }
-
-    return average;
-}
-
-int FindAroundPixelNum(Bmp *pic, int x,int y,Palette color)
-{
-    int num=0;
-    for(int i=x-1;i<=x+1;i++)
-    {
-        for(int j=y-1;j<=y+1;j++)
-        {
-            if(x!=i||y!=j)
-            {
-                if(pic->getpixel(i,j).TellColor()==color.TellColor())
-                {
-                    num++;
-                }
-            }
-        }
-    }
-    return num;
-}
-
-int AntiColor(Bmp *source,Bmp *dest)
-{
-    int width=source->width();
-    int height=source->height();
-
-    for(int i=0;i<width;i++)
-    {
-        for(int j=0;j<height;j++)
-        {
-            Palette temp=source->getpixel(i,j);
-            dest->pixel(i,j,Palette(~temp.Blue,~temp.Green,~temp.Red));
-        }
-    }
-
-    return 0;
-}
-
-Palette AverageColor(Bmp *source,int x,int y,int pixel)
-{
-    int NumEffective=0;
-    int width=source->width();
-    int height=source->height();
-    int Red=0,Blue=0,Green=0;
-
-    for(int i=x-pixel;i<=x+pixel;i++)
-    {
-        for(int j=y-pixel;j<y+pixel;j++)
-        {
-            if(i>=0&&i<width&&j>=0&&j<height)
-            {
-                NumEffective++;
-                Palette temp;
-                temp=source->getpixel(i,j);
-                Red+=temp.Red;
-                Green+=temp.Green;
-                Blue+=temp.Blue;
-            }
-        }
-    }
-
-    Red/=NumEffective;
-    Green/=NumEffective;
-    Blue/=NumEffective;
-
-    return Palette(Blue,Green,Red);
-}
-
-int Blurry(Bmp *source,Bmp *dest,int pixel)
-{
-    int width=source->width();
-    int height=source->height();
-
-    for(int i=0;i<width;i++)
-    {
-        for(int j=0;j<height;j++)
-        {
-            dest->pixel(i,j,AverageColor(source,i,j,pixel));
-        }
-    }
-
-    return 0;
-}
-
-int Mosaic(Bmp *source,Bmp *dest,int pixel)
-{
-    int width=source->width();
-    int height=source->height();
-
-    for(int i=pixel;i<width+pixel;i+=2*pixel)
-    {
-        for(int j=pixel;j<height+pixel;j+=2*pixel)
-        {
-            Palette color=AverageColor(source,i,j,pixel);
-            for(int x=i-pixel;x<=i+pixel;x++)
-            {
-                for(int y=j-pixel;y<=j+pixel;y++)
-                {
-                    dest->pixel(x,y,color);
-                }
-            }
-        }
-    }
-    return 0;
-}
