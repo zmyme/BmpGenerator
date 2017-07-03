@@ -7,7 +7,7 @@
 
 // #include <cstdlib>
 
-#pragma pack(2)
+
 
 typedef short INT_16;
 typedef int INT_32;
@@ -67,6 +67,8 @@ public:
     INT_8 Green;
     INT_8 Red;
 };
+#pragma pack(push)
+#pragma pack(2)
 
 struct BmpFileHeader
 {
@@ -91,6 +93,8 @@ struct BmpInfoHeader
 	INT_32 biClrUsed;       // 0 will be okay.
 	INT_32 biClrImportant;  //0 will be okay.
 };
+
+#pragma pack(pop)
 
 class Bmp
 {
@@ -131,6 +135,7 @@ public:
 	int load(const char *path);
     int write(const char *path);
     int resize(int NewWidth,int NewHeight);
+    int resize(float percent);
 
 	//basic draw function.
     int SetSize(INT_32 width, INT_32 height);
@@ -185,6 +190,7 @@ private:
 
 int RGB2Grey(Bmp *source, Bmp *dest);
 int Grey2Binary(Bmp *source,Bmp *dest,float light);
+int Grey2Binary(Bmp *source,Bmp *dest,int Threshold);
 int AntiColor(Bmp *source,Bmp *dest);
 Palette AverageColor(Bmp *source,int x,int y,int pixel);
 int Blurry(Bmp *source,Bmp *dest,int pixel);
@@ -193,9 +199,10 @@ int AdjustLight(Bmp *source,Bmp *dest,float light);
 int ImageFusion(Bmp *pic1,float weight1,Bmp *pic2,float weight2,Bmp *dest);
 float GetPixelPercentAround(Bmp *pic,int x,int y,int pixel,Palette color);
 int EliminateNoiseInBinaryPic(Bmp *source,Bmp *dest,int pixel,float noise);
-
-
+int ShowHistogram(Bmp &source,Bmp &output);
+int FindContours(Bmp &source,Bmp &dest,int type);
 
 // int Blurry2(Bmp *source,Bmp *dest,int pixel);
+
 
 #endif

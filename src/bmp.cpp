@@ -216,4 +216,11 @@ int Bmp::resize(int NewWidth,int NewHeight)
     return 0;
 }
 
+int Bmp::resize(float percent)
+{
+    int NewWidth = width()*percent;
+    int NewHeight = height()*percent;
+    resize(NewWidth,NewHeight);
+    return 0;
+}
 

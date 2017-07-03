@@ -1,5 +1,51 @@
 #include <vector>
 #include "bmp.h"
+#include "errorcode.h"
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
+int FindContours(Bmp &source,Bmp &dest,int type)
+{
+    int width = source.width();
+    int height = source.height();
+    Bmp Temp(width,height);
+    RGB2Grey(&source,&Temp);
+    for(int i=0;i<width;i++)
+    {
+        for(int j=0;j<height;j++)
+        {
+            int list[9];
+            int k=0;
+            for(k=0;k<9;k++) list[k]=0;
+            k=0;
+            for(int x=i-1;x<=i+1;x++)
+            {
+                for(int y=j-1;y<=j+1;y++)
+                {
+                    if(x>=0 && y>=0 && x<width && y<height)
+                    {
+                        list[k]=Temp.getpixel(i,j).Blue - Temp.getpixel(x,y).Blue;
+                        if(list[k]<0) list[k]=-list[k];
+                    }
+                    k++;
+                }
+            }
+            int max=0;
+            for(k=0;k<9;k++)
+            {
+                if(list[k]>max)
+                {
+                    max=list[k];
+                }
+            }
+
+            dest.pixel(i,j,Palette(255-max,255-max,255-max));
+        }
+    }
+    return 0;
+}
 
 int RGB2Grey(Bmp *source, Bmp *dest)
 {
@@ -48,6 +94,28 @@ int Grey2Binary(Bmp *source,Bmp *dest,float light)
     }
 
     return average;
+}
+
+int Grey2Binary(Bmp *source,Bmp *dest,int Threshold)
+{
+    for(int i=0;i<source->width();i++)
+    {
+        for(int j=0;j<source->height();j++)
+        {
+            Palette temp=source->getpixel(i,j);
+            if(temp.Blue>Threshold)
+            {
+                dest->pixel(i,j,Palette(255,255,255));
+            }
+            else
+            {
+                dest->pixel(i,j,Palette(0,0,0));
+            }
+            
+        }
+    }
+
+    return 0;
 }
 
 int FindAroundPixelNum(Bmp *pic, int x,int y,Palette color)
@@ -267,6 +335,109 @@ int EliminateNoiseInBinaryPic(Bmp *source,Bmp *dest,int pixel,float noise)
                 }
             }
         }
+    }
+
+    return 0;
+}
+
+int ShowHistogram(Bmp &source,Bmp &output)
+{
+    int Red[256];
+    int Green[256];
+    int Blue[256];
+
+    int width = source.width();
+    int height = source.height();
+
+    for(int i=0;i<255;i++)
+    {
+        Red[i] = 0;
+        Green[i] = 0;
+        Blue[i] = 0;
+    }
+
+    for(int i=0;i<width;i++)
+    {
+        for(int j=0;j<height;j++)
+        {
+            Palette temp=source.getpixel(i,j);
+            Red[temp.Red]++;
+            Blue[temp.Blue]++;
+            Green[temp.Green]++;
+        }
+    }
+
+    int RedMax = 0;
+    int BlueMax = 0;
+    int GreenMax = 0;
+
+    for(int i=0;i<255;i++)
+    {
+        if(Red[i]>RedMax)
+        {
+            RedMax = Red[i];
+        }
+
+        if(Blue[i]>BlueMax)
+        {
+            BlueMax = Blue[i];
+        }
+
+        if(Green[i]>GreenMax)
+        {
+            GreenMax = Green[i];
+        }
+
+    }
+
+    for(int i=0;i<255;i++)
+    {
+        Red[i] = Red[i]*255/RedMax;
+        Blue[i] = Blue[i]*255/BlueMax;
+        Green[i] = Green[i]*255/GreenMax;
+    }
+
+    int GraphWidth = output.width();
+    int GraphHeight = output.height();
+
+    if(GraphHeight<256)
+    {
+        return PIC_GIVEN_TOO_SMALL;
+    }
+    if(GraphWidth<256)
+    {
+        return PIC_GIVEN_TOO_SMALL;
+    }
+
+    int Dwidth = GraphWidth/256;
+    int Dheight = GraphHeight/256;
+
+    int LastX = 0;
+    int LastY = Red[0]*Dheight;
+
+    for(int i=1;i<256;i++)
+    {
+        output.line(LastX,GraphHeight-LastY,LastX+Dwidth,GraphHeight-Red[i]*Dheight,Dheight,Palette(0,0,255));
+        LastX+=Dwidth;
+        LastY=Red[i]*Dheight;
+    }
+    LastX = 0;
+    LastY = Blue[0]*Dheight;
+
+    for(int i=1;i<256;i++)
+    {
+        output.line(LastX,GraphHeight-LastY,LastX+Dwidth,GraphHeight-Blue[i]*Dheight,Dheight,Palette(255,0,0));
+        LastX+=Dwidth;
+        LastY=Blue[i]*Dheight;
+    }
+    LastX = 0;
+    LastY = Green[0]*Dheight;
+
+    for(int i=1;i<256;i++)
+    {
+        output.line(LastX,GraphHeight-LastY,LastX+Dwidth,GraphHeight-Green[i]*Dheight,Dheight,Palette(0,255,0));
+        LastX+=Dwidth;
+        LastY=Green[i]*Dheight;
     }
 
     return 0;
