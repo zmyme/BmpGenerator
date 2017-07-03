@@ -1,4 +1,4 @@
-#Welcom to BmpGenerator!
+# Welcom to BmpGenerator!
 
 
 
@@ -6,7 +6,7 @@
 
 This is an tiny C++ library which can be used to draw something on a bmp picture. It can be used in algorithm visualization and maybe computer vision (this may cost sometime but i will try my best to make it ^_^).
 
-##2. How to install it?
+## 2. How to install it?
 
 This might be the most easy to use library you may have ever seen since it is so small. Just add the bmp.cpp in the ./src directory to your source code directory and bmp.h in the ./include directory to your include directory and then you can wirte you own programme. Here is an example.
 
@@ -38,7 +38,7 @@ if it doesn't work, the you may be using a different compiler or under a diferen
 
 INT_NUMBER means it should be defined as a integar which takes up NUMBER bit. change this to your computer and then compile it again, if you still can't solve the problem ,you can open a issue or you can just email me.
 
-##3. How to use it?
+## 3. How to use it?
 
 Currently I only provided a few function for you to use. here they are:
 
@@ -53,13 +53,13 @@ Currently I only provided a few function for you to use. here they are:
 
 As to the detail document, please return somedays later and i will wirite a full document.
 
-##4. Which operating system will it support?
+## 4. Which operating system will it support?
 
 Only windows 7 above is supported. But if you do not use graphic support,it is likely to support most openating systems with g++ or others compilers that support C++. 
 
-##5. Somethings else
+## 5. Somethings else
 
-###How did this started?
+### How did this started?
 
 I always wanted to start a porject which can help me to draw some picture and i think this is useful. I know there is some really really huge and perfect project like OpenCV, but it is just so big and sometimes hard to install(To be honest, It took me some effort to install OpenCV to my computer and make it work at the first time.), So I want to write a tiny small library myself.
 
